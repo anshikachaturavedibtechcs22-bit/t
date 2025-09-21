@@ -1,7 +1,4 @@
-streamlit
-tensorflow
 pandas
-numpy
 Pillow
 googlemaps
 streamlit-geolocation
@@ -12,3 +9,13 @@ plotly
 gspread
 gdown
 oauth2client
+streamlit
+tensorflow==2.10.1
+numpy==1.23.5
+requests
+h5py
+Pillow
+pandas
+matplotlib
+scikit-learn
+
