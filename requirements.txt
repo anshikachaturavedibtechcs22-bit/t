@@ -10,12 +10,13 @@ gspread
 gdown
 oauth2client
 streamlit
-tensorflow==2.15.0
+tensorflow==2.20.0
 numpy>=1.26.0
 requests
 h5py
 matplotlib
 scikit-learn
+
 
 
 
