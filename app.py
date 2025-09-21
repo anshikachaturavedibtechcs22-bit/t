@@ -32,22 +32,34 @@ import gdown
 from tensorflow.keras.models import load_model
 
 
-MODEL_FILE = "Effi_WRM.keras"
-GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
+import tensorflow as tf
+import numpy as np
+from PIL import Image
 
-# Download the model if it doesn't exist or is empty
-if not os.path.exists(MODEL_FILE) or os.path.getsize(MODEL_FILE) == 0:
-    print("Downloading Keras model from Google Drive...")
-    gdown.download(GOOGLE_DRIVE_URL, MODEL_FILE, quiet=False)
+# Load your existing TFLite model
+interpreter = tf.lite.Interpreter(model_path="Effi_WRM.tflite")
+interpreter.allocate_tensors()
 
-# Verify file exists and size > 0
-if not os.path.exists(MODEL_FILE) or os.path.getsize(MODEL_FILE) == 0:
-    raise FileNotFoundError(f"{MODEL_FILE} not found or empty! Check Google Drive URL.")
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
-# Load model
-model = load_model(MODEL_FILE, compile=False)
-print("Model loaded successfully!")
+def classify_image_tflite(img: Image.Image):
+    # Resize image to model's input shape
+    input_shape = input_details[0]['shape']
+    img_resized = img.resize((input_shape[1], input_shape[2]))
+    
+    # Convert to numpy array, normalize, add batch dimension
+    input_data = np.expand_dims(np.array(img_resized, dtype=np.float32) / 255.0, axis=0)
 
+    # Run inference
+    interpreter.set_tensor(input_details[0]['index'], input_data)
+    interpreter.invoke()
+
+    output_data = interpreter.get_tensor(output_details[0]['index'])[0]
+    pred_class_idx = np.argmax(output_data)
+    confidence = float(np.max(output_data)) * 100
+
+    return pred_class_idx, confidence, output_data
 
 
 
@@ -588,7 +600,9 @@ def render_classifier_page():
             img = Image.open(uploaded_file).convert('RGB')
             st.session_state.uploaded_image = img
             with st.spinner('🧠 AI is thinking...'):
-                pred_class, conf, preds = classify_image(img)
+                pred_class_idx, conf, preds = classify_image_tflite(img)
+                pred_class = class_names[pred_class_idx]  # map index to class name
+
             st.session_state.prediction = pred_class; st.session_state.confidence = conf; st.session_state.preds = preds
             st.session_state.feedback_submitted = False; st.experimental_rerun()
     else:
@@ -919,6 +933,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
