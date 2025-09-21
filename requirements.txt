@@ -11,12 +11,13 @@ gdown
 oauth2client
 streamlit
 tensorflow==2.20.0
-numpy==1.23.5
+numpy>=1.26.0
 requests
 h5py
 Pillow
 pandas
 matplotlib
 scikit-learn
+
 
 
