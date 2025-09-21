@@ -250,10 +250,9 @@ def load_custom_css():
 # ==========================
 #  Model Loading
 # ==========================    
-
 @st.cache_resource
 def load_my_model():
-    model_path = UPDATED_MODEL_FILE if os.path.exists(UPDATED_MODEL_FILE) else MODEL_FILE
+    model_path = UPDATED_MODEL_FILE if os.path.exists(UPDATED_MODEL_FILE) else "Effi_WRM.keras"
     model = load_model(model_path, compile=False)
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
@@ -933,6 +932,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
