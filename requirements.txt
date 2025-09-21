@@ -1,0 +1,13 @@
+streamlit
+tensorflow
+pandas
+numpy
+Pillow
+googlemaps
+streamlit-geolocation
+geopy
+folium
+requests
+plotly
+gspread
+oauth2client
