@@ -27,22 +27,21 @@ import requests
 import os
 import gdown
 from keras.models import load_model
+import os
+import gdown
+from tensorflow.keras.models import load_model
 
-# Local file name for your model
-MODEL_FILE = "Effi_WRM.keras"
+MODEL_FILE = os.path.join(os.getcwd(), "Effi_WRM.keras")
+GOOGLE_DRIVE_URL = "https://drive.google.com/uc?id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
 
-# Google Drive direct download URL
-GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
-
-
-# Download model if it doesn't exist
+# Download if file doesn't exist
 if not os.path.exists(MODEL_FILE):
-    print("Downloading model from Google Drive...")
     gdown.download(GOOGLE_DRIVE_URL, MODEL_FILE, quiet=False)
 
-# Load the model
+# Load model
 model = load_model(MODEL_FILE, compile=False)
 print("Model loaded successfully!")
+
 
 # ==========================
 # Page Config 
@@ -912,5 +911,6 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
