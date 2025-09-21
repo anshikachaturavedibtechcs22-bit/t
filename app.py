@@ -250,14 +250,29 @@ def load_custom_css():
 # ==========================
 #  Model Loading
 # ==========================    
-@st.cache_resource
-def load_my_model():
-    model_path = UPDATED_MODEL_FILE if os.path.exists(UPDATED_MODEL_FILE) else "Effi_WRM.keras"
-    model = load_model(model_path, compile=False)
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    return model
+import tensorflow as tf
+import numpy as np
+from PIL import Image
 
-model = load_my_model()
+# Load TFLite model
+interpreter = tf.lite.Interpreter(model_path="Effi_WRM.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+def classify_image_tflite(img: Image.Image):
+    input_shape = input_details[0]['shape']
+    img_resized = img.resize((input_shape[1], input_shape[2]))
+    input_data = np.expand_dims(np.array(img_resized, dtype=np.float32) / 255.0, axis=0)
+
+    interpreter.set_tensor(input_details[0]['index'], input_data)
+    interpreter.invoke()
+    
+    output_data = interpreter.get_tensor(output_details[0]['index'])[0]
+    pred_class_idx = np.argmax(output_data)
+    confidence = float(np.max(output_data)) * 100
+    return pred_class_idx, confidence, output_data
 
     
    # ================================================
@@ -932,6 +947,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
