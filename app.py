@@ -31,16 +31,25 @@ import os
 import gdown
 from tensorflow.keras.models import load_model
 
-MODEL_FILE = os.path.join(os.getcwd(), "Effi_WRM.keras")
+
+MODEL_FILE = "Effi_WRM.keras"
 GOOGLE_DRIVE_URL = "https://drive.google.com/uc?id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
 
-# Download if file doesn't exist
+# Ensure the file exists in current working directory
 if not os.path.exists(MODEL_FILE):
+    print("Downloading model...")
     gdown.download(GOOGLE_DRIVE_URL, MODEL_FILE, quiet=False)
+else:
+    print(f"Model file found at: {os.path.abspath(MODEL_FILE)}")
 
-# Load model
-model = load_model(MODEL_FILE, compile=False)
+# Double-check the file exists
+if not os.path.isfile(MODEL_FILE):
+    raise FileNotFoundError(f"{MODEL_FILE} not found! Check download path.")
+
+# Load the model
+model = load_model(os.path.abspath(MODEL_FILE), compile=False)
 print("Model loaded successfully!")
+
 
 
 # ==========================
@@ -911,6 +920,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
