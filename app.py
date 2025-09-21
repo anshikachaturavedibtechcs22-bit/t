@@ -656,7 +656,7 @@ def render_classifier_page():
             st.session_state.user_location = location
             st.info("Your location has been found. Click the button below to see the route on a map.")
             if st.button(ui_texts['map_button'][lang]):
-                st.session_state.show_map = True; st.experimental_rerun()
+                st.session_state.show_map = True;
         else:
             st.warning("To use the map feature, please **'Allow'** location access in your browser.")
         st.markdown("---")
@@ -947,6 +947,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
