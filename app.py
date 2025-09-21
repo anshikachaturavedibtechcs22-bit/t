@@ -618,7 +618,7 @@ def render_classifier_page():
                 pred_class = class_names[pred_class_idx]  # map index to class name
 
             st.session_state.prediction = pred_class; st.session_state.confidence = conf; st.session_state.preds = preds
-            st.session_state.feedback_submitted = False; st.experimental_rerun()
+            st.session_state.feedback_submitted = False; 
     else:
         st.header(ui_texts['result_title'][lang])
         col1, col2 = st.columns([1, 2])
@@ -947,6 +947,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
