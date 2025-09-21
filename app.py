@@ -33,22 +33,21 @@ from tensorflow.keras.models import load_model
 
 
 MODEL_FILE = "Effi_WRM.keras"
-GOOGLE_DRIVE_URL = "https://drive.google.com/uc?id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
+GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
 
-# Ensure the file exists in current working directory
-if not os.path.exists(MODEL_FILE):
-    print("Downloading model...")
+# Download the model if it doesn't exist or is empty
+if not os.path.exists(MODEL_FILE) or os.path.getsize(MODEL_FILE) == 0:
+    print("Downloading Keras model from Google Drive...")
     gdown.download(GOOGLE_DRIVE_URL, MODEL_FILE, quiet=False)
-else:
-    print(f"Model file found at: {os.path.abspath(MODEL_FILE)}")
 
-# Double-check the file exists
-if not os.path.isfile(MODEL_FILE):
-    raise FileNotFoundError(f"{MODEL_FILE} not found! Check download path.")
+# Verify file exists and size > 0
+if not os.path.exists(MODEL_FILE) or os.path.getsize(MODEL_FILE) == 0:
+    raise FileNotFoundError(f"{MODEL_FILE} not found or empty! Check Google Drive URL.")
 
-# Load the model
-model = load_model(os.path.abspath(MODEL_FILE), compile=False)
+# Load model
+model = load_model(MODEL_FILE, compile=False)
 print("Model loaded successfully!")
+
 
 
 
@@ -920,6 +919,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
