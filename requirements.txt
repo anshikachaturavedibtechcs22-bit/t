@@ -10,4 +10,5 @@ folium
 requests
 plotly
 gspread
+gdown
 oauth2client
