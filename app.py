@@ -930,7 +930,7 @@ with st.sidebar:
                 st.session_state.page = key
                 if st.session_state.page != "Waste Classifier":
                     st.session_state.prediction = None; st.session_state.uploaded_image = None
-                st.experimental_rerun()
+              
     st.sidebar.markdown("---")
     st.sidebar.info("© 2025 TrashLens")
 
@@ -947,6 +947,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
