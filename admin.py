@@ -39,7 +39,7 @@ def check_password():
     if st.button("Login"):
         if password == st.secrets["ADMIN_PASSWORD"]:
             st.session_state.password_correct = True
-            st.experimental_rerun()
+           
         else:
             st.error("The password you entered is incorrect.")
     return False
@@ -143,3 +143,4 @@ else:
             except subprocess.CalledProcessError as e:
                 st.error("❌ Training script failed.")
                 st.text_area("Error:", e.stderr, height=200)
+
