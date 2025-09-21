@@ -32,7 +32,8 @@ from keras.models import load_model
 MODEL_FILE = "Effi_WRM.keras"
 
 # Google Drive direct download URL
-GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg"
+GOOGLE_DRIVE_URL = "https://drive.google.com/uc?export=download&id=1XaSPF0H031LEauh8tvw67yFRSIDJWItg
+"
 
 # Download model if it doesn't exist
 if not os.path.exists(MODEL_FILE):
@@ -911,3 +912,4 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
