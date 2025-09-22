@@ -35,7 +35,7 @@ from tensorflow.keras.models import load_model
 import tensorflow as tf
 import numpy as np
 from PIL import Image
-
+#............
 # Load your existing TFLite model
 interpreter = tf.lite.Interpreter(model_path="Effi_WRM.tflite")
 interpreter.allocate_tensors()
@@ -956,6 +956,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
