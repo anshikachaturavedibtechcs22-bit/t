@@ -4,6 +4,9 @@ import os
 import subprocess
 import plotly.express as px
 from supabase import create_client, Client
+import base64
+import io
+from PIL import Image
 
 # Page configuration
 st.set_page_config(page_title="Admin Panel", page_icon="🛠️", layout="wide")
@@ -20,13 +23,12 @@ st.markdown("""
 # --- Configuration ---
 MODEL_FILE = "Effi_WRM.keras"
 UPDATED_MODEL_FILE = "Effi_WRM_updated.keras"
-IMAGE_DIR = "feedback_images"
 
 # --- Supabase / PostgreSQL Setup ---
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_ANON_KEY"]
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-FEEDBACK_TABLE = "feedback_records"
+FEEDBACK_TABLE = "feedback"   # 👈 make sure table name matches your Supabase DB
 
 # --- Session State Initialization ---
 if "password_correct" not in st.session_state:
@@ -57,11 +59,11 @@ st.markdown("---")
 
 # Load feedback data from Supabase
 response = supabase.table(FEEDBACK_TABLE).select("*").execute()
-if response.data is None or len(response.data) == 0:
+df = pd.DataFrame(response.data) if response.data else pd.DataFrame()
+
+if df.empty:
     st.info("No feedback records yet.")
 else:
-    df = pd.DataFrame(response.data)
-    
     # --- Interactive Dashboard ---
     st.subheader("📊 At a Glance")
     correct_count = df[df['correct'] == 'Yes'].shape[0]
@@ -73,7 +75,9 @@ else:
     col3.metric("❌ Incorrect Predictions", incorrect_count)
     
     if incorrect_count > 0 or correct_count > 0:
-        fig = px.pie(values=[correct_count, incorrect_count], names=['Correct', 'Incorrect'], title='Prediction Accuracy based on Feedback')
+        fig = px.pie(values=[correct_count, incorrect_count],
+                     names=['Correct', 'Incorrect'],
+                     title='Prediction Accuracy based on Feedback')
         st.plotly_chart(fig, use_container_width=True)
     
     st.markdown("---")
@@ -85,14 +89,10 @@ else:
         with st.container():
             if st.session_state.confirming_delete == index:
                 st.warning(f"**Are you sure you want to delete this feedback record?** This action cannot be undone.")
-                c1, c2, c3 = st.columns([1, 1, 5])
+                c1, c2, _ = st.columns([1, 1, 5])
                 if c1.button("✅ Yes, Delete", key=f"yes_del_{index}"):
                     # Delete from Supabase
                     supabase.table(FEEDBACK_TABLE).delete().eq("timestamp", row['timestamp']).execute()
-                    filename = str(row.get("filename", "")).strip()
-                    img_path = os.path.join(IMAGE_DIR, filename)
-                    if os.path.exists(img_path):
-                        os.remove(img_path)
                     st.session_state.confirming_delete = None
                     st.success(f"Record {index} deleted.")
                     st.experimental_rerun()
@@ -101,17 +101,19 @@ else:
                     st.experimental_rerun()
             else:
                 cols = st.columns([1, 2, 2, 2, 1])
-                filename = str(row.get("filename", "")).strip()
-                img_path = os.path.join(IMAGE_DIR, filename)
-                
+
+                # Image display (from base64 in DB)
+                img_base64 = row.get("image_base64", None)
                 with cols[0]:
-                    if os.path.exists(img_path):
-                        st.image(img_path, width=70)
+                    if img_base64:
+                        img_bytes = base64.b64decode(img_base64)
+                        img = Image.open(io.BytesIO(img_bytes))
+                        st.image(img, width=70)
                     else:
                         st.text("No Img")
-                
+
                 cols[1].write(f"**Predicted:** `{row.get('predicted', 'N/A')}`")
-                
+
                 correct_status = row.get('correct', 'N/A')
                 if correct_status == 'Yes' or correct_status == 'हाँ':
                     cols[2].success(f"**Correct?:** {correct_status}")
