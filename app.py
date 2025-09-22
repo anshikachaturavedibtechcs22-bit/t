@@ -555,23 +555,25 @@ import io
 import base64
 
 def save_feedback(predicted, correct, new_class, pil_img):
-    # Timestamp banao
+    # Timestamp aur filename banao
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{timestamp}.png"
 
-    # Image ko Base64 encode karna (agar database me image bhi rakhni ho)
+    # PIL image ko memory buffer me save karo
     buffered = io.BytesIO()
     pil_img.save(buffered, format="PNG")
+
+    # Image ko Base64 encode karo
     img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
 
-    # Supabase table me insert karna
+    # Supabase table me insert karo
     supabase.table("feedback").insert({
         "timestamp": timestamp,
         "filename": filename,
         "predicted": predicted,
         "correct": correct,
         "new_class": new_class,
-        "image_base64": img_base64  # optional hai, agar table me column banaya ho
+        "image_base64": img_base64
     }).execute()
 
 @st.cache_data
@@ -954,6 +956,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
