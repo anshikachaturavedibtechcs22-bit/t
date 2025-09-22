@@ -549,23 +549,30 @@ def get_route(start_lon, start_lat, end_lon, end_lat):
         r = requests.get(url); r.raise_for_status(); route = r.json()['routes'][0]['geometry']['coordinates']
         route = [(coord[1], coord[0]) for coord in route]; return route
     except Exception: return None
+from db import supabase
+import datetime
+import io
+import base64
+
 def save_feedback(predicted, correct, new_class, pil_img):
-    if not os.path.exists(FEEDBACK_FILE):
-        pd.DataFrame(columns=["timestamp", "filename", "predicted", "correct", "new_class"]).to_csv(FEEDBACK_FILE, index=False)
-    
+    # Timestamp banao
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{timestamp}.png"
-    filepath = os.path.join(FEEDBACK_IMG_DIR, filename)
-    pil_img.save(filepath)
-    
-    df = pd.read_csv(FEEDBACK_FILE)
-    new_record = {
-        "timestamp": timestamp, "filename": filename, "predicted": predicted,
-        "correct": correct, "new_class": new_class
-    }
-    df = pd.concat([df, pd.DataFrame([new_record])], ignore_index=True)
-    df.to_csv(FEEDBACK_FILE, index=False)
-# PURANE FUNCTION KO HATAKAR YE NAYA WALA PASTE KAR
+
+    # Image ko Base64 encode karna (agar database me image bhi rakhni ho)
+    buffered = io.BytesIO()
+    pil_img.save(buffered, format="PNG")
+    img_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    # Supabase table me insert karna
+    supabase.table("feedback").insert({
+        "timestamp": timestamp,
+        "filename": filename,
+        "predicted": predicted,
+        "correct": correct,
+        "new_class": new_class,
+        "image_base64": img_base64  # optional hai, agar table me column banaya ho
+    }).execute()
 
 @st.cache_data
 def get_image_as_base64(path, max_size=(200, 200)):
@@ -947,6 +954,7 @@ else:
     elif page == "Waste Types": render_waste_types_page()
 
     elif page == "Do's and Don'ts": render_dos_donts_page()
+
 
 
 
